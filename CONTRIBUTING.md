@@ -17,7 +17,7 @@ get set up, the standards we follow, and how to submit changes.
 ## Development Setup
 
 ```bash
-git clone https://github.com/yourorg/firmxtract
+git clone https://github.com/imran-khatib/firmxtract
 cd firmxtract
 python3 -m venv .venv
 source .venv/bin/activate
