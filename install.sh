@@ -249,6 +249,30 @@ else
 fi
 
 # ------------------------------------------------------------------------------
+# Create system-wide binary (so firmxtract works without activating venv)
+# ------------------------------------------------------------------------------
+step "Creating system-wide firmxtract command..."
+
+VENV_PYTHON="$(pwd)/$VENV_DIR/bin/python3"
+BINARY_PATH="/usr/local/bin/firmxtract"
+
+# Write wrapper script
+sudo tee "$BINARY_PATH" > /dev/null << WRAPPER
+#!/bin/bash
+exec "$VENV_PYTHON" -m firmxtract.cli.main "\$@"
+WRAPPER
+
+sudo chmod +x "$BINARY_PATH"
+
+if command -v firmxtract &>/dev/null; then
+    success "firmxtract installed as system command: $BINARY_PATH"
+    success "You can now run 'firmxtract' from ANY terminal without activating venv"
+else
+    warn "Could not create system binary. You will need to activate venv manually:"
+    warn "  source $(pwd)/.venv/bin/activate"
+fi
+
+# ------------------------------------------------------------------------------
 # Fix serial port permissions (Linux only)
 # ------------------------------------------------------------------------------
 if [[ "$OS" == "debian" || "$OS" == "fedora" || "$OS" == "arch" ]]; then
@@ -343,10 +367,7 @@ echo -e "${GREEN}╔════════════════════
 echo -e "${GREEN}║   Installation complete!                     ║${RESET}"
 echo -e "${GREEN}╚══════════════════════════════════════════════╝${RESET}"
 echo ""
-echo -e "${BOLD}To activate FirmXtract in a new terminal:${RESET}"
-echo -e "  ${CYAN}source $(pwd)/.venv/bin/activate${RESET}"
-echo ""
-echo -e "${BOLD}Quick start:${RESET}"
+echo -e "${BOLD}Quick start (works in any terminal — no venv needed):${RESET}"
 echo -e "  ${CYAN}firmxtract info${RESET}               # check system status"
 echo -e "  ${CYAN}firmxtract extract${RESET}            # auto-detect and extract"
 echo -e "  ${CYAN}firmxtract analyze firmware.bin${RESET}   # analyze existing file"
