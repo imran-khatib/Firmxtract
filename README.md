@@ -1,5 +1,18 @@
 # FirmXtract
 
+```
+███████╗██╗██████╗ ███╗   ███╗██╗  ██╗████████╗██████╗  █████╗  ██████╗████████╗
+██╔════╝██║██╔══██╗████╗ ████║╚██╗██╔╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝
+█████╗  ██║██████╔╝██╔████╔██║ ╚███╔╝    ██║   ██████╔╝███████║██║        ██║
+██╔══╝  ██║██╔══██╗██║╚██╔╝██║ ██╔██╗    ██║   ██╔══██╗██╔══██║██║        ██║
+██║     ██║██║  ██║██║ ╚═╝ ██║██╔╝ ██╗   ██║   ██║  ██║██║  ██║╚██████╗   ██║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝   ╚═╝
+
+    v0.1.0  |  IoT Firmware Extraction & Red-Teaming Framework
+    by imran-khatib  |  https://github.com/imran-khatib/Firmxtract
+    ═══════════════════════════════════════════════════════════════
+```
+
 > Unified IoT Firmware Extraction, Analysis, and Red-Teaming Framework
 
 FirmXtract replaces fragmented tools (binwalk, flashrom, OpenOCD, UART utilities) with one
@@ -26,13 +39,13 @@ The authors accept no liability for misuse.
 |---------|--------|
 | UART console detection (pyserial) | ✅ |
 | UART baud rate auto-sweep | ✅ |
-| Interactive UART console (`Firmxtract console`) | ✅ |
+| Interactive UART console (`firmxtract console`) | ✅ |
 | SPI flash dump via flashrom | ✅ |
 | Programmer auto-detection (ch341a, ft2232h, buspirate, serprog) | ✅ |
 | UART → SPI automatic fallback | ✅ |
 | binwalk signature scan + recursive extraction | ✅ |
 | Session management + JSON report | ✅ |
-| `Firmxtract report` viewer | ✅ |
+| `firmxtract report` viewer | ✅ |
 | Rich CLI (typer + rich) | ✅ |
 
 ## Roadmap
@@ -64,15 +77,15 @@ flashrom and binwalk are **optional** — FirmXtract will skip unavailable tools
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/imran-khatib/Firmxtract
-cd Firmxtract
+git clone https://github.com/yourorg/firmxtract
+cd firmxtract
 
 # 2. Install in editable mode with development dependencies
 pip install -e ".[dev]"
 
 # 3. Verify the install
-Firmxtract version
-Firmxtract info
+firmxtract version
+firmxtract info
 ```
 
 ### From source (runtime only — no dev tools)
@@ -98,37 +111,37 @@ pip install -e .
 
 ```bash
 # Show system information: tool availability + detected serial ports
-Firmxtract info
+firmxtract info
 
 # Auto-detect hardware and run full extraction pipeline
-Firmxtract extract
+firmxtract extract
 
 # Specify UART port and baud rate explicitly
-Firmxtract extract --port /dev/ttyUSB0 --baud 115200
+firmxtract extract --port /dev/ttyUSB0 --baud 115200
 
 # Force SPI extraction with a specific programmer
-Firmxtract extract --method spi --programmer ch341a_spi
+firmxtract extract --method spi --programmer ch341a_spi
 
 # Save session output to a custom directory
-Firmxtract extract --output-dir /tmp/router_fw/
+firmxtract extract --output-dir /tmp/router_fw/
 
 # Extract without running binwalk afterward
-Firmxtract extract --no-analyze
+firmxtract extract --no-analyze
 
 # Analyze an existing firmware dump (no hardware needed)
-Firmxtract analyze firmware.bin
+firmxtract analyze firmware.bin
 
 # Analyze without extracting filesystem (signature scan only)
-Firmxtract analyze firmware.bin --no-extract
+firmxtract analyze firmware.bin --no-extract
 
 # Open an interactive UART console
-Firmxtract console --port /dev/ttyUSB0 --baud 115200
+firmxtract console --port /dev/ttyUSB0 --baud 115200
 
 # View the most recent session report
-Firmxtract report
+firmxtract report
 
 # View a specific session report
-Firmxtract report ~/.Firmxtract/sessions/20260402_143022/
+firmxtract report ~/.firmxtract/sessions/20260402_143022/
 ```
 
 ---
@@ -139,8 +152,8 @@ Firmxtract report ~/.Firmxtract/sessions/20260402_143022/
 
 1. Connect USB-to-UART adapter to target board: TX→RX, RX→TX, GND→GND
 2. **Do NOT connect the 3.3V/5V pin if the board is externally powered** — you will fry it
-3. Run `Firmxtract info` to confirm the port appears under "Serial Ports"
-4. Run `Firmxtract extract --port /dev/ttyUSB0` (or let it auto-detect)
+3. Run `firmxtract info` to confirm the port appears under "Serial Ports"
+4. Run `firmxtract extract --port /dev/ttyUSB0` (or let it auto-detect)
 
 **Common UART adapter device names:**
 
@@ -159,7 +172,7 @@ If you get a "permission denied" error on Linux: `sudo usermod -aG dialout $USER
 1. **Power OFF** the target device completely
 2. Connect the ch341a SOIC8 clip to the SPI flash chip (pin 1 marked with dot)
 3. Consult the flash chip datasheet to confirm pinout
-4. Run `Firmxtract extract --method spi --programmer ch341a_spi`
+4. Run `firmxtract extract --method spi --programmer ch341a_spi`
 
 > **Voltage warning:** ch341a outputs 3.3V. Some older flash chips require 5V.
 > Verify the chip's VCC spec before connecting.
@@ -168,7 +181,7 @@ If you get a "permission denied" error on Linux: `sudo usermod -aG dialout $USER
 
 ## Configuration
 
-FirmXtract looks for `~/.Firmxtract/config.toml`. If not found, built-in defaults are used.
+FirmXtract looks for `~/.firmxtract/config.toml`. If not found, built-in defaults are used.
 
 ### Full example config
 
@@ -190,7 +203,7 @@ matryoshka = true   # recursive extraction
 entropy_scan = false
 
 [output]
-base_dir = "~/.Firmxtract/sessions"
+base_dir = "~/.firmxtract/sessions"
 ```
 
 ### Environment variable overrides
@@ -207,10 +220,10 @@ export FIRMXTRACT_BINWALK_PATH=/usr/bin/binwalk
 
 ## Session Output
 
-Each run creates a timestamped directory under `~/.Firmxtract/sessions/`:
+Each run creates a timestamped directory under `~/.firmxtract/sessions/`:
 
 ```
-~/.Firmxtract/sessions/20260402_143022/
+~/.firmxtract/sessions/20260402_143022/
 ├── firmware.bin                   # SPI flash dump (raw binary)
 │   OR uart_capture.log            # UART boot log capture (Phase 1)
 ├── _firmware.bin.extracted/       # binwalk recursive extraction
@@ -223,7 +236,7 @@ Each run creates a timestamped directory under `~/.Firmxtract/sessions/`:
 └── report.json                    # Full machine-readable session report
 ```
 
-View the report with: `Firmxtract report`
+View the report with: `firmxtract report`
 
 ---
 
@@ -234,7 +247,7 @@ View the report with: `Firmxtract report`
 pytest -m "not hardware"
 
 # Run with coverage
-pytest -m "not hardware" --cov=src/Firmxtract --cov-report=term-missing
+pytest -m "not hardware" --cov=src/firmxtract --cov-report=term-missing
 
 # Lint (ruff)
 ruff check src/ tests/
