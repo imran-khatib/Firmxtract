@@ -17,8 +17,8 @@ get set up, the standards we follow, and how to submit changes.
 ## Development Setup
 
 ```bash
-git clone https://github.com/imran-khatib/firmxtract
-cd firmxtract
+git clone https://github.com/imran-khatib/Firmxtract
+cd Firmxtract
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"

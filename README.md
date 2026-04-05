@@ -77,8 +77,8 @@ flashrom and binwalk are **optional** — FirmXtract will skip unavailable tools
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourorg/firmxtract
-cd firmxtract
+git clone https://github.com/imran-khatib/Firmxtract
+cd Firmxtract
 
 # 2. Install in editable mode with development dependencies
 pip install -e ".[dev]"
