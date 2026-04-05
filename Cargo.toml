@@ -1,0 +1,11 @@
+[workspace]
+members = ["rust"]
+resolver = "2"
+
+# Phase 2: Rust native extension modules via PyO3 + Maturin
+# Compiled as Python extension: firmxtract._native
+#
+# Planned modules:
+#   rust/src/uart_scanner.rs  — high-speed baud rate detection
+#   rust/src/spi_parser.rs    — low-level SPI protocol parser
+#   rust/src/entropy.rs       — fast entropy analysis on binary blobs

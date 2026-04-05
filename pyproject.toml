@@ -1,0 +1,133 @@
+# ---------------------------------------------------------------------------
+# FirmXtract — pyproject.toml
+#
+# Phase 1 build backend: setuptools (no Rust required)
+# Phase 2 migration: swap build-system block to maturin when Rust modules land
+# ---------------------------------------------------------------------------
+
+[build-system]
+# Phase 1: pure-Python, no Rust toolchain required.
+# Phase 2: replace these two lines with:
+#   requires = ["maturin>=1.4,<2.0"]
+#   build-backend = "maturin"
+requires = ["setuptools>=42.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "firmxtract"
+version = "0.1.0"
+description = "Unified IoT Firmware Extraction, Analysis, and Red-Teaming Framework"
+authors = [{ name = "FirmXtract Project" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["iot", "firmware", "security", "reverse-engineering", "pentest"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Security",
+    "Topic :: System :: Hardware",
+]
+
+# Runtime dependencies
+# Notes:
+#   - tomllib is stdlib in 3.11+; no extra dep needed.
+#   - typer[all] pulls in rich + shellingham automatically.
+#   - pydantic removed: not used in Phase 1.
+dependencies = [
+    "typer[all]>=0.12.0,<1.0",
+    "pyserial>=3.5,<4.0",
+    "rich>=13.0.0,<14.0",
+    "tomli>=2.0.0,<3.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0,<9.0",
+    "pytest-cov>=5.0.0,<6.0",
+    "pytest-mock>=3.14.0,<4.0",
+    "ruff>=0.4.0,<1.0",
+    "black>=24.0.0,<25.0",
+    "mypy>=1.10.0,<2.0",
+]
+ci = [
+    "pytest>=8.0.0,<9.0",
+    "pytest-cov>=5.0.0,<6.0",
+    "pytest-mock>=3.14.0,<4.0",
+    "ruff>=0.4.0,<1.0",
+]
+
+[project.scripts]
+firmxtract = "firmxtract.cli.main:main"
+
+[project.urls]
+Repository = "https://github.com/YOUR_USERNAME/firmxtract"
+Documentation = "https://github.com/YOUR_USERNAME/firmxtract#readme"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["firmxtract*"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+# Phase 2 Maturin stub — uncomment when Rust modules are added:
+# [tool.maturin]
+# module-name = "firmxtract._native"
+# python-source = "src"
+# features = ["pyo3/extension-module"]
+# manifest-path = "rust/Cargo.toml"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "S", "B", "C4", "PIE", "T20"]
+ignore = [
+    "S603",
+    "S607",
+    "T201",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "hardware: requires physical hardware (skip with -m 'not hardware')",
+    "slow: long-running tests (skip with -m 'not slow')",
+    "integration: requires external tools binwalk flashrom",
+]
+addopts = "-v --tb=short -p no:warnings"
+
+[tool.coverage.run]
+source = ["src/firmxtract"]
+omit = ["tests/*", "src/firmxtract/cli/*"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 70
+
+[tool.mypy]
+python_version = "3.10"
+mypy_path = "src"
+strict = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_return_any = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = "serial.*"
+ignore_missing_imports = true

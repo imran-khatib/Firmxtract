@@ -1,0 +1,1 @@
+"""firmxtract.hardware package."""
