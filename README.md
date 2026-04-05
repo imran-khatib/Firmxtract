@@ -26,13 +26,13 @@ The authors accept no liability for misuse.
 |---------|--------|
 | UART console detection (pyserial) | ✅ |
 | UART baud rate auto-sweep | ✅ |
-| Interactive UART console (`firmxtract console`) | ✅ |
+| Interactive UART console (`Firmxtract console`) | ✅ |
 | SPI flash dump via flashrom | ✅ |
 | Programmer auto-detection (ch341a, ft2232h, buspirate, serprog) | ✅ |
 | UART → SPI automatic fallback | ✅ |
 | binwalk signature scan + recursive extraction | ✅ |
 | Session management + JSON report | ✅ |
-| `firmxtract report` viewer | ✅ |
+| `Firmxtract report` viewer | ✅ |
 | Rich CLI (typer + rich) | ✅ |
 
 ## Roadmap
@@ -64,15 +64,15 @@ flashrom and binwalk are **optional** — FirmXtract will skip unavailable tools
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourorg/firmxtract
-cd firmxtract
+git clone https://github.com/imran-khatib/Firmxtract
+cd Firmxtract
 
 # 2. Install in editable mode with development dependencies
 pip install -e ".[dev]"
 
 # 3. Verify the install
-firmxtract version
-firmxtract info
+Firmxtract version
+Firmxtract info
 ```
 
 ### From source (runtime only — no dev tools)
@@ -98,37 +98,37 @@ pip install -e .
 
 ```bash
 # Show system information: tool availability + detected serial ports
-firmxtract info
+Firmxtract info
 
 # Auto-detect hardware and run full extraction pipeline
-firmxtract extract
+Firmxtract extract
 
 # Specify UART port and baud rate explicitly
-firmxtract extract --port /dev/ttyUSB0 --baud 115200
+Firmxtract extract --port /dev/ttyUSB0 --baud 115200
 
 # Force SPI extraction with a specific programmer
-firmxtract extract --method spi --programmer ch341a_spi
+Firmxtract extract --method spi --programmer ch341a_spi
 
 # Save session output to a custom directory
-firmxtract extract --output-dir /tmp/router_fw/
+Firmxtract extract --output-dir /tmp/router_fw/
 
 # Extract without running binwalk afterward
-firmxtract extract --no-analyze
+Firmxtract extract --no-analyze
 
 # Analyze an existing firmware dump (no hardware needed)
-firmxtract analyze firmware.bin
+Firmxtract analyze firmware.bin
 
 # Analyze without extracting filesystem (signature scan only)
-firmxtract analyze firmware.bin --no-extract
+Firmxtract analyze firmware.bin --no-extract
 
 # Open an interactive UART console
-firmxtract console --port /dev/ttyUSB0 --baud 115200
+Firmxtract console --port /dev/ttyUSB0 --baud 115200
 
 # View the most recent session report
-firmxtract report
+Firmxtract report
 
 # View a specific session report
-firmxtract report ~/.firmxtract/sessions/20260402_143022/
+Firmxtract report ~/.Firmxtract/sessions/20260402_143022/
 ```
 
 ---
@@ -139,8 +139,8 @@ firmxtract report ~/.firmxtract/sessions/20260402_143022/
 
 1. Connect USB-to-UART adapter to target board: TX→RX, RX→TX, GND→GND
 2. **Do NOT connect the 3.3V/5V pin if the board is externally powered** — you will fry it
-3. Run `firmxtract info` to confirm the port appears under "Serial Ports"
-4. Run `firmxtract extract --port /dev/ttyUSB0` (or let it auto-detect)
+3. Run `Firmxtract info` to confirm the port appears under "Serial Ports"
+4. Run `Firmxtract extract --port /dev/ttyUSB0` (or let it auto-detect)
 
 **Common UART adapter device names:**
 
@@ -159,7 +159,7 @@ If you get a "permission denied" error on Linux: `sudo usermod -aG dialout $USER
 1. **Power OFF** the target device completely
 2. Connect the ch341a SOIC8 clip to the SPI flash chip (pin 1 marked with dot)
 3. Consult the flash chip datasheet to confirm pinout
-4. Run `firmxtract extract --method spi --programmer ch341a_spi`
+4. Run `Firmxtract extract --method spi --programmer ch341a_spi`
 
 > **Voltage warning:** ch341a outputs 3.3V. Some older flash chips require 5V.
 > Verify the chip's VCC spec before connecting.
@@ -168,7 +168,7 @@ If you get a "permission denied" error on Linux: `sudo usermod -aG dialout $USER
 
 ## Configuration
 
-FirmXtract looks for `~/.firmxtract/config.toml`. If not found, built-in defaults are used.
+FirmXtract looks for `~/.Firmxtract/config.toml`. If not found, built-in defaults are used.
 
 ### Full example config
 
@@ -190,7 +190,7 @@ matryoshka = true   # recursive extraction
 entropy_scan = false
 
 [output]
-base_dir = "~/.firmxtract/sessions"
+base_dir = "~/.Firmxtract/sessions"
 ```
 
 ### Environment variable overrides
@@ -207,10 +207,10 @@ export FIRMXTRACT_BINWALK_PATH=/usr/bin/binwalk
 
 ## Session Output
 
-Each run creates a timestamped directory under `~/.firmxtract/sessions/`:
+Each run creates a timestamped directory under `~/.Firmxtract/sessions/`:
 
 ```
-~/.firmxtract/sessions/20260402_143022/
+~/.Firmxtract/sessions/20260402_143022/
 ├── firmware.bin                   # SPI flash dump (raw binary)
 │   OR uart_capture.log            # UART boot log capture (Phase 1)
 ├── _firmware.bin.extracted/       # binwalk recursive extraction
@@ -223,7 +223,7 @@ Each run creates a timestamped directory under `~/.firmxtract/sessions/`:
 └── report.json                    # Full machine-readable session report
 ```
 
-View the report with: `firmxtract report`
+View the report with: `Firmxtract report`
 
 ---
 
@@ -234,7 +234,7 @@ View the report with: `firmxtract report`
 pytest -m "not hardware"
 
 # Run with coverage
-pytest -m "not hardware" --cov=src/firmxtract --cov-report=term-missing
+pytest -m "not hardware" --cov=src/Firmxtract --cov-report=term-missing
 
 # Lint (ruff)
 ruff check src/ tests/

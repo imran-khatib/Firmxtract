@@ -60,8 +60,8 @@
   If you prefer to install manually:
 
     1. Unzip the project:
-         unzip firmxtract_phase1_final.zip
-         cd firmxtract
+         unzip Firmxtract_phase1_final.zip
+         cd Firmxtract
 
     2. Create a virtual environment:
          python3 -m venv .venv
@@ -72,8 +72,8 @@
          pip install -e ".[dev]"
 
     4. Verify:
-         firmxtract version
-         firmxtract info
+         Firmxtract version
+         Firmxtract info
 
     OR just run:  bash install.sh
     (The install script does all of the above automatically.)
@@ -82,11 +82,11 @@
   COMMANDS
 --------------------------------------------------------------------------------
 
-  firmxtract info
+  Firmxtract info
     Show system status: which tools are installed, which serial ports detected.
     Run this first to confirm your setup is correct.
 
-  firmxtract extract
+  Firmxtract extract
     Run the full pipeline. Auto-detects hardware, extracts firmware,
     runs binwalk, hunts for secrets, saves a report.
 
@@ -100,14 +100,14 @@
       --no-analyze             Skip binwalk + secrets scan after extraction
       -v / --verbose           Show debug output
 
-  firmxtract analyze firmware.bin
+  Firmxtract analyze firmware.bin
     Analyze an existing firmware file. No hardware needed.
 
     Options:
       --no-extract             Signature scan only, skip filesystem extraction
       --output-dir /tmp/out    Save results to custom directory
 
-  firmxtract console --port /dev/ttyUSB0
+  Firmxtract console --port /dev/ttyUSB0
     Open an interactive terminal on a UART port.
     Everything you type is sent to the device. Device output is printed here.
     Press Ctrl+] to exit (same as telnet).
@@ -115,13 +115,13 @@
     Options:
       --baud 115200            Set baud rate (uses config default if omitted)
 
-  firmxtract report
+  Firmxtract report
     Display the most recent session report in the terminal.
 
-    firmxtract report ~/.firmxtract/sessions/20260402_143022/
+    Firmxtract report ~/.Firmxtract/sessions/20260402_143022/
     View a specific session by path.
 
-  firmxtract version
+  Firmxtract version
     Print the installed version number.
 
 --------------------------------------------------------------------------------
@@ -132,34 +132,34 @@
 
     Step 1 - Connect USB-UART adapter: TX->RX, RX->TX, GND->GND
     Step 2 - Find your port:
-               firmxtract info
+               Firmxtract info
     Step 3 - Extract:
-               firmxtract extract --port /dev/ttyUSB0
+               Firmxtract extract --port /dev/ttyUSB0
     Step 4 - View results:
-               firmxtract report
+               Firmxtract report
 
   EXAMPLE 2: Dump SPI flash with ch341a programmer
 
     Step 1 - Power OFF the target device
     Step 2 - Clip onto SPI chip (pin 1 = dot on chip)
     Step 3 - Run:
-               firmxtract extract --method spi --programmer ch341a_spi
+               Firmxtract extract --method spi --programmer ch341a_spi
     Step 4 - View results:
-               firmxtract report
+               Firmxtract report
 
   EXAMPLE 3: Analyze a firmware file you already have
 
-    firmxtract analyze /path/to/firmware.bin
+    Firmxtract analyze /path/to/firmware.bin
 
   EXAMPLE 4: Auto-detect everything (simplest)
 
-    firmxtract extract
+    Firmxtract extract
     (FirmXtract tries UART first, falls back to SPI if UART fails)
 
   EXAMPLE 5: Extract then manually analyze later
 
-    firmxtract extract --no-analyze
-    firmxtract analyze ~/.firmxtract/sessions/latest/firmware.bin
+    Firmxtract extract --no-analyze
+    Firmxtract analyze ~/.Firmxtract/sessions/latest/firmware.bin
 
 --------------------------------------------------------------------------------
   HARDWARE WIRING REFERENCE
@@ -185,8 +185,8 @@
     2. Attach the SOIC8 clip to the flash chip
     3. Pin 1 of the chip is marked with a small dot or notch
     4. Connect ch341a USB to your computer
-    5. Verify with: firmxtract info  (should show the programmer)
-    6. Run: firmxtract extract --method spi
+    5. Verify with: Firmxtract info  (should show the programmer)
+    6. Run: Firmxtract extract --method spi
 
   COMMON UART DEVICE NAMES:
     Linux:
@@ -201,7 +201,7 @@
 --------------------------------------------------------------------------------
 
   Every run creates a timestamped folder:
-    ~/.firmxtract/sessions/YYYYMMDD_HHMMSS/
+    ~/.Firmxtract/sessions/YYYYMMDD_HHMMSS/
 
   Contents:
     firmware.bin              Raw firmware dump (SPI) or UART dd extraction
@@ -215,15 +215,15 @@
     binwalk_scan.log          All signatures found (CSV format)
     report.json               Full machine-readable JSON report
 
-  View in terminal:   firmxtract report
-  View raw JSON:      cat ~/.firmxtract/sessions/<session>/report.json
+  View in terminal:   Firmxtract report
+  View raw JSON:      cat ~/.Firmxtract/sessions/<session>/report.json
 
 --------------------------------------------------------------------------------
   CONFIGURATION (optional)
 --------------------------------------------------------------------------------
 
   FirmXtract works with zero configuration using built-in defaults.
-  To customize, create:  ~/.firmxtract/config.toml
+  To customize, create:  ~/.Firmxtract/config.toml
 
   Example config file:
 
@@ -243,7 +243,7 @@
     matryoshka = true
 
     [output]
-    base_dir = "~/.firmxtract/sessions"
+    base_dir = "~/.Firmxtract/sessions"
 
   Environment variable overrides:
     export FIRMXTRACT_OUTPUT_DIR=/mnt/data/sessions
@@ -260,7 +260,7 @@
     pytest -m "not hardware"
 
   With coverage report:
-    pytest -m "not hardware" --cov=src/firmxtract --cov-report=term-missing
+    pytest -m "not hardware" --cov=src/Firmxtract --cov-report=term-missing
 
   Hardware tests (physical device required):
     pytest -m hardware -v
@@ -269,7 +269,7 @@
   TROUBLESHOOTING
 --------------------------------------------------------------------------------
 
-  Problem:  "command not found: firmxtract"
+  Problem:  "command not found: Firmxtract"
   Fix:      Make sure your virtual environment is activated:
               source .venv/bin/activate
             Then reinstall:
@@ -287,12 +287,12 @@
   Fix:      pip install binwalk
             or: sudo apt install binwalk
 
-  Problem:  "No serial ports detected" in firmxtract info
+  Problem:  "No serial ports detected" in Firmxtract info
   Fix:      Unplug and replug USB adapter. Check dmesg | tail -20 for errors.
 
   Problem:  UART produces garbled output
   Fix:      Wrong baud rate. Run baud sweep:
-              firmxtract extract --port /dev/ttyUSB0
+              Firmxtract extract --port /dev/ttyUSB0
             FirmXtract will auto-sweep common rates.
 
   Problem:  pip install fails with "externally managed environment"
@@ -305,8 +305,8 @@
   PROJECT STRUCTURE
 --------------------------------------------------------------------------------
 
-  firmxtract/
-  |-- src/firmxtract/
+  Firmxtract/
+  |-- src/Firmxtract/
   |   |-- cli/main.py          Command-line interface (6 commands)
   |   |-- core/
   |   |   |-- orchestrator.py  Pipeline controller
