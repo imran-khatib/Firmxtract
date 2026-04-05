@@ -14,7 +14,7 @@ requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "firmxtract"
+name = "Firmxtract"
 version = "0.1.0"
 description = "Unified IoT Firmware Extraction, Analysis, and Red-Teaming Framework"
 authors = [{ name = "FirmXtract Project" }]
@@ -63,22 +63,22 @@ ci = [
 ]
 
 [project.scripts]
-firmxtract = "firmxtract.cli.main:main"
+Firmxtract = "Firmxtract.cli.main:main"
 
 [project.urls]
-Repository = "https://github.com/YOUR_USERNAME/firmxtract"
-Documentation = "https://github.com/YOUR_USERNAME/firmxtract#readme"
+Repository = "https://github.com/imran-khatib/Firmxtract"
+Documentation = "https://github.com/imran-khatib/Firmxtract#readme"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-include = ["firmxtract*"]
+include = ["Firmxtract*"]
 
 [tool.setuptools.package-dir]
 "" = "src"
 
 # Phase 2 Maturin stub — uncomment when Rust modules are added:
 # [tool.maturin]
-# module-name = "firmxtract._native"
+# module-name = "Firmxtract._native"
 # python-source = "src"
 # features = ["pyo3/extension-module"]
 # manifest-path = "rust/Cargo.toml"
@@ -112,8 +112,8 @@ markers = [
 addopts = "-v --tb=short -p no:warnings"
 
 [tool.coverage.run]
-source = ["src/firmxtract"]
-omit = ["tests/*", "src/firmxtract/cli/*"]
+source = ["src/Firmxtract"]
+omit = ["tests/*", "src/Firmxtract/cli/*"]
 
 [tool.coverage.report]
 show_missing = true
