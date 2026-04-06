@@ -70,7 +70,7 @@ class ExtractionMethod(str, Enum):
 # ---------------------------------------------------------------------------
 
 
-@app.callback()
+@app.callback(invoke_without_command=True)
 def _global_options(
     ctx: typer.Context,
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug output."),
@@ -85,6 +85,11 @@ def _global_options(
     elif quiet:
         level = logging.ERROR
     setup_logging(level=level)
+
+    # Show banner + help when no subcommand given
+    if ctx.invoked_subcommand is None:
+        _print_banner()
+        console.print(ctx.get_help())
 
 
 # ---------------------------------------------------------------------------
@@ -242,7 +247,7 @@ def analyze(
 # ---------------------------------------------------------------------------
 
 
-@app.command()
+@app.command("console")
 def console_cmd(
     port: str = typer.Option(..., "--port", "-p", help="Serial port (e.g. /dev/ttyUSB0)."),
     baudrate: int | None = typer.Option(
@@ -471,8 +476,14 @@ def _print_banner() -> None:
     console.print("[bold cyan]██║     ██║██║  ██║██║ ╚═╝ ██║██╔╝ ██╗   ██║   ██║  ██║██║  ██║╚██████╗   ██║   [/bold cyan]")
     console.print("[bold cyan]╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   [/bold cyan]")
     console.print("")
-    console.print(f"    [dim]v{ver}[/dim]  [bold white]|[/bold white]  [dim]IoT Firmware Extraction & Red-Teaming Framework[/dim]")
-    console.print("    [dim]by imran-khatib[/dim]  [bold white]|[/bold white]  [dim]https://github.com/imran-khatib/Firmxtract[/dim]")
+    console.print(
+        f"    [dim]v{ver}[/dim]  [bold white]|[/bold white]  "
+        "[dim]IoT Firmware Extraction & Red-Teaming Framework[/dim]"
+    )
+    console.print(
+        "    [dim]by imran-khatib[/dim]  [bold white]|[/bold white]  "
+        "[dim]https://github.com/imran-khatib/Firmxtract[/dim]"
+    )
     console.print("    [cyan]" + "═" * 65 + "[/cyan]")
     console.print("")
 
