@@ -177,24 +177,48 @@ def create_session(config: FirmXtractConfig | None = None) -> Session:
     """
     Factory: create a new Session with a timestamped output directory.
 
+    Output directory priority:
+      1. --output-dir flag (via config.output.base_dir override)
+      2. ./firmxtract_sessions/<timestamp>/ in current working directory
+      3. ~/.firmxtract/sessions/<timestamp>/ (fallback if cwd is not writable)
+      4. /tmp/firmxtract_<timestamp>/ (last resort)
+
     Args:
         config: Optional config override. Defaults to get_config().
 
     Returns:
         A Session with output_dir created on disk (mode 0o700).
     """
+    import os
     cfg = config or get_config()
     now = datetime.now()
     session_id = now.strftime("%Y%m%d_%H%M%S")
 
-    output_dir = cfg.output.base_dir / session_id
+    # If user explicitly set output dir (via --output-dir), use it
+    default_base = Path.home() / ".firmxtract" / "sessions"
+    user_set_output = cfg.output.base_dir != default_base
+
+    if user_set_output:
+        # User explicitly specified --output-dir
+        output_dir = cfg.output.base_dir / session_id
+    else:
+        # Default: save in current working directory
+        output_dir = Path.cwd() / "firmxtract_sessions" / session_id
+
     try:
         output_dir.mkdir(parents=True, exist_ok=True, mode=cfg.output.permissions)
-    except OSError as exc:
-        # Fallback to /tmp if home dir is unavailable
-        log.warning(f"Could not create session dir {output_dir}: {exc}. Using /tmp.")
-        output_dir = Path("/tmp") / f"firmxtract_{session_id}"
-        output_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
+        log.debug(f"Session output: {output_dir}")
+    except OSError:
+        # CWD not writable — fall back to home dir
+        output_dir = Path.home() / ".firmxtract" / "sessions" / session_id
+        try:
+            output_dir.mkdir(parents=True, exist_ok=True, mode=cfg.output.permissions)
+            log.debug(f"CWD not writable, using home: {output_dir}")
+        except OSError as exc:
+            # Last resort: /tmp
+            log.warning(f"Could not create session dir: {exc}. Using /tmp.")
+            output_dir = Path("/tmp") / f"firmxtract_{session_id}"
+            output_dir.mkdir(parents=True, exist_ok=True, mode=0o700)
 
     session = Session(
         session_id=session_id,

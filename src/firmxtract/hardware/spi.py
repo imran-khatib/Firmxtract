@@ -117,7 +117,15 @@ def _get_chip_id(
     timeout: float,
 ) -> tuple[str | None, str | None]:
     """
-    Run flashrom --flash-name to identify the chip without dumping.
+    Probe flashrom to identify the chip without dumping.
+
+    Uses: flashrom -p <programmer>
+    This is the standard probe — flashrom identifies the chip and prints
+    info to stdout/stderr. Works regardless of exit code (flashrom often
+    returns non-zero even on successful detection on some systems).
+
+    Also tries: flashrom -p <programmer> --flash-name
+    for newer flashrom versions that support it.
 
     Args:
         flashrom_path: Absolute path to flashrom binary.
@@ -127,38 +135,83 @@ def _get_chip_id(
     Returns:
         Tuple of (chip_id_string, chip_name_string) or (None, None) on failure.
     """
-    cmd = [flashrom_path, "-p", programmer, "--flash-name"]
-    try:
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
+    import re
+
+    # Strategy: run basic probe (no action flag) — flashrom always prints chip
+    # info during probe regardless of what action follows
+    for cmd in [
+        [flashrom_path, "-p", programmer],               # basic probe
+        [flashrom_path, "-p", programmer, "--flash-name"],  # newer flashrom
+    ]:
+        try:
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+            )
+        except subprocess.TimeoutExpired:
+            log.debug(f"  flashrom probe timed out for {programmer}")
+            continue
+        except FileNotFoundError:
+            log.debug(f"  flashrom binary not found: {flashrom_path}")
+            return None, None
+
+        # Combine stdout + stderr — flashrom prints to both depending on version
+        combined = result.stdout + result.stderr
+        log.debug(f"  [{programmer}] rc={result.returncode}")
+        log.debug(f"  stdout: {result.stdout.strip()[:200]!r}")
+        log.debug(f"  stderr: {result.stderr.strip()[:200]!r}")
+
+        # Look for chip identification in combined output
+        # Patterns flashrom uses:
+        #   "Found Winbond flash chip "W25Q64.V""
+        #   vendor="Winbond" name="W25Q64.V"
+        #   "No EEPROM/flash device found." (failure)
+
+        if "No EEPROM" in combined or "No flash device" in combined:
+            log.debug(f"  {programmer}: no chip found")
+            continue
+
+        # Try to extract chip name from "Found X flash chip "Y"" pattern
+        found_match = re.search(
+            r'Found\s+\S+\s+flash\s+chip\s+"([^"]+)"',
+            combined, re.IGNORECASE
         )
-    except subprocess.TimeoutExpired:
-        log.debug(f"  flashrom --flash-name timed out for {programmer}")
-        return None, None
-    except FileNotFoundError:
-        log.debug(f"  flashrom binary not found: {flashrom_path}")
-        return None, None
+        if found_match:
+            chip_name = found_match.group(1)
+            log.debug(f"  {programmer}: chip found — {chip_name}")
+            return chip_name, chip_name
 
-    log.debug(f"  flashrom stdout: {result.stdout.strip()!r}")
-    log.debug(f"  flashrom stderr: {result.stderr.strip()!r}")
+        # Try vendor="X" name="Y" format
+        name_match = re.search(r'name="([^"]+)"', combined)
+        if name_match:
+            chip_name = name_match.group(1)
+            return chip_name, chip_name
 
-    if result.returncode == _FLASHROM_OK:
-        # Output format: "vendor=\"Winbond\" name=\"W25Q64.V\""
-        chip_id = _parse_chip_id(result.stdout)
-        chip_name = _parse_chip_name(result.stdout)
-        return chip_id or "detected", chip_name
+        # If output contains chip-like data without "No EEPROM" error,
+        # treat as detected (some flashrom versions are terse)
+        if result.returncode == _FLASHROM_OK and len(combined.strip()) > 10:
+            chip_id = _parse_chip_id(combined)
+            chip_name = _parse_chip_name(combined)
+            if chip_id or chip_name:
+                return chip_id or "detected", chip_name
+            # Flashrom ran OK and produced output — chip likely found
+            return "detected", None
 
     return None, None
 
 
 def _parse_chip_id(output: str) -> str | None:
-    """Extract chip ID from flashrom output."""
+    """Extract chip ID from flashrom output (stdout or stderr)."""
     for line in output.splitlines():
+        line = line.strip()
+        if not line:
+            continue
         if "vendor=" in line.lower() or "name=" in line.lower():
-            return line.strip()
+            return line
+        if "found" in line.lower() and "flash chip" in line.lower():
+            return line
     return None
 
 
