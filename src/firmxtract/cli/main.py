@@ -452,7 +452,8 @@ def info() -> None:
 @app.command()
 def version() -> None:
     """Print FirmXtract version and exit."""
-    console.print(f"FirmXtract [bold]{get_version()}[/bold]")
+    _print_banner()
+    console.print(f"Version: [bold]{get_version()}[/bold]")
 
 
 # ---------------------------------------------------------------------------
@@ -462,15 +463,18 @@ def version() -> None:
 
 def _print_banner() -> None:
     ver = get_version()
-    pad = " " * (13 - len(ver))
-    console.print(
-        "\n[bold cyan]╔══════════════════════════════════════╗[/bold cyan]"
-        f"\n[bold cyan]║[/bold cyan]  [bold white]FirmXtract[/bold white] "
-        f"[dim]v{ver}[/dim]{pad}[bold cyan]           ║[/bold cyan]"
-        "\n[bold cyan]║[/bold cyan]  [dim]IoT Firmware Analysis Framework[/dim]"
-        "    [bold cyan]║[/bold cyan]"
-        "\n[bold cyan]╚══════════════════════════════════════╝[/bold cyan]\n"
-    )
+    console.print("")
+    console.print("[bold cyan]███████╗██╗██████╗ ███╗   ███╗██╗  ██╗████████╗██████╗  █████╗  ██████╗████████╗[/bold cyan]")
+    console.print("[bold cyan]██╔════╝██║██╔══██╗████╗ ████║╚██╗██╔╝╚══██╔══╝██╔══██╗██╔══██╗██╔════╝╚══██╔══╝[/bold cyan]")
+    console.print("[bold cyan]█████╗  ██║██████╔╝██╔████╔██║ ╚███╔╝    ██║   ██████╔╝███████║██║        ██║   [/bold cyan]")
+    console.print("[bold cyan]██╔══╝  ██║██╔══██╗██║╚██╔╝██║ ██╔██╗    ██║   ██╔══██╗██╔══██║██║        ██║   [/bold cyan]")
+    console.print("[bold cyan]██║     ██║██║  ██║██║ ╚═╝ ██║██╔╝ ██╗   ██║   ██║  ██║██║  ██║╚██████╗   ██║   [/bold cyan]")
+    console.print("[bold cyan]╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝   ╚═╝   [/bold cyan]")
+    console.print("")
+    console.print(f"    [dim]v{ver}[/dim]  [bold white]|[/bold white]  [dim]IoT Firmware Extraction & Red-Teaming Framework[/dim]")
+    console.print("    [dim]by imran-khatib[/dim]  [bold white]|[/bold white]  [dim]https://github.com/imran-khatib/Firmxtract[/dim]")
+    console.print("    [cyan]" + "═" * 65 + "[/cyan]")
+    console.print("")
 
 
 # ---------------------------------------------------------------------------
